@@ -1,0 +1,48 @@
+name: Bug Report
+description: 버그 관련 이슈 템플릿
+title: "[BUG] "
+labels: ["bug"]
+body:
+        - type: markdown
+          attributes:
+                value: |
+                        버그 발생 시, 아래 항목을 작성해주세요.
+        - type: textarea
+          id: what-happened
+          attributes:
+                label: 무슨 버그가 발생했나요?
+                description: 정상 동작 시, 어떤 동작이 발생해야 하는지를 포함해 작성해주세요(스크린샷 등을 포함).
+                placeholder: 예) 로그인 시, 로그인이 되어야 하는데 로그인이 되지 않습니다.
+          validations:
+                required: true
+        - type: dropdown
+          id: severity
+          attributes:
+                label: 버그의 심각도는 어느 정도인가요?
+                description: 버그의 심각도를 선택해주세요.
+                Low - 버그가 발생하더라도 정상적인 서비스 이용이 가능한 경우
+                Medium - 버그가 발생하면 서비스 이용이 불가능한 경우
+                High - 버그가 발생하면 서비스 이용이 불가능하고, 서비스의 안정성에 영향을 미치는 경우
+                options:
+                        - Low
+                        - Medium
+                        - High
+          validations:
+                required: true
+        - type: dropdown
+          id: browsers
+          attributes:
+                label: 버그가 발생한 브라우저는 어떤 것인가요?
+                description: 버그가 발생한 브라우저를 선택해주세요.
+                options:
+                        - Chrome
+                        - Firefox
+                        - Safari
+                        - Edge
+                        - Internet Explorer
+        - type: textarea
+          id: logs
+          attributes:
+                label: 버그 발생 시, 로그를 첨부해주세요.
+                description: 버그와 관련된 로그를 첨부해주세요.
+                render: shell
