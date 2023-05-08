@@ -1,17 +1,5 @@
-## - PR Type
-
--   [ ] Bugfix
--   [ ] Feature
--   [ ] Code style update
--   [ ] Refactoring
--   [ ] Build related changes
--   [ ] CI related changes
--   [ ] Documentation content changes
--   [ ] Others... Please describe:
-        <br>
-
 ## - Motivation
-
+관련 이슈: #
 -
 
 <br>
