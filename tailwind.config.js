@@ -1,3 +1,5 @@
+const { createThemes } = require('tw-colors')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -7,13 +9,20 @@ module.exports = {
     './src/modules/**/*.{js,ts,jsx,tsx,mdx}',
     './src/templates/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
-    extend: {
-      colors: {
-        'background-color': '#edf2f7',
-        'primary-color': '#718096',
-      },
-    },
+    extend: {},
   },
-  plugins: [],
+  plugins: [
+    createThemes({
+      light: {
+        'background-color': '#e5e5e5',
+        'primary-color': '#404040',
+      },
+      dark: {
+        'background-color': '#404040',
+        'primary-color': '#e5e5e5',
+      },
+    }),
+  ],
 }
