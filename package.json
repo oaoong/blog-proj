@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --updateSnapshot",
+    "test": "jest --updateSnapshot --passWithNoTests",
     "test:watch": "jest --watch --updateSnapshot",
     "test:ci": "jest --ci",
     "cypress": "cypress open",
