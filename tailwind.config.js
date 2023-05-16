@@ -11,7 +11,11 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    screens: {
+      mobile: { max: '640px' },
+      tablet: { max: '768px' },
+      laptop: { max: '1280px' },
+    },
   },
   plugins: [
     createThemes({

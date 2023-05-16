@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge'
 
 const tagVariants = cva(
   [
-    'bg-primary-color text-background-color rounded-md justify-center items-center flex w-fit min-w-[2rem]',
+    'bg-primary-color text-background-color rounded-tr-lg justify-center items-center flex w-fit min-w-[2rem] px-1 py-0.5 cursor-pointer hover:underline',
   ],
   {
     variants: {

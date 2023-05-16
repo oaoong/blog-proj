@@ -16,11 +16,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <ThemeProvider attribute='data-theme'>
-        <div className='block w-full h-full'>
+        <div className='block w-full h-full bg-background-color'>
           <NavBar />
-          <div className='flex flex-row'>
+          <div className='flex flex-row pt-24 mobile:flex-col'>
             <SideBar />
-            <div className='flex flex-col items-center justify-center w-screen h-screen border-4 border-r-0 border-opacity-25 rounded-l text-primary-color bg-background-color border-primary-color'>
+            <div className='flex flex-col items-center justify-center w-screen h-screen text-primary-color bg-background-color '>
               <Component {...pageProps} />
             </div>
           </div>
