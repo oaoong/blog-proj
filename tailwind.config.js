@@ -11,17 +11,23 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    screens: {
+      mobile: { max: '640px' },
+      tablet: { max: '768px' },
+      laptop: { max: '1280px' },
+    },
   },
   plugins: [
     createThemes({
       light: {
         'background-color': '#e5e5e5',
         'primary-color': '#404040',
+        'card-background-color': '#d4d4d4',
       },
       dark: {
         'background-color': '#404040',
         'primary-color': '#e5e5e5',
+        'card-background-color': '#525252',
       },
     }),
   ],
