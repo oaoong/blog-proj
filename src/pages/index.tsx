@@ -1,3 +1,5 @@
+import HomePage from '@/templates/home/home-page'
+
 export default function Home() {
-  return <main>hi</main>
+  return <HomePage />
 }
