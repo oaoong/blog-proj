@@ -1,6 +1,7 @@
 import React, { forwardRef, HTMLAttributes } from 'react'
 import JBCard from '@/components/atoms/card/jb-card'
 import JBTag from '@/components/atoms/tag/jb-tag'
+import Link from 'next/link'
 
 interface PostData {
   data: {
@@ -26,20 +27,22 @@ const JBPost = forwardRef<HTMLDivElement, JBPostProps>(
     })
 
     return (
-      <JBCard>
-        <div ref={ref} {...props} className='relative block w-full h-full'>
-          <div className='flex justify-between mb-2 mobile:flex-col'>
-            <h2 className='text-3xl font-bold cursor-pointer hover:underline'>
-              {title}
-            </h2>
-            <p>{date}</p>
+      <Link href={`blog/${title}`}>
+        <JBCard>
+          <div ref={ref} {...props} className='relative block w-full h-full'>
+            <div className='flex justify-between mb-2 mobile:flex-col'>
+              <h2 className='text-3xl font-bold cursor-pointer hover:underline'>
+                {title}
+              </h2>
+              <p>{date}</p>
+            </div>
+            <p>{content}</p>
+            <div className='absolute bottom-0 flex flex-row gap-2'>
+              {tagElements}
+            </div>
           </div>
-          <p>{content}</p>
-          <div className='absolute bottom-0 flex flex-row gap-2'>
-            {tagElements}
-          </div>
-        </div>
-      </JBCard>
+        </JBCard>
+      </Link>
     )
   },
 )
