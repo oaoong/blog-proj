@@ -1,13 +1,11 @@
 import JBMDXPost from '@/components/atoms/mdx-post/jb-mdx-post'
 import React from 'react'
-import Content from '@/contents/test.mdx'
+import { PostProps } from '@/pages/blog/[...id]'
 
-export default function BlogPost() {
+export default function BlogPost({ post }: PostProps) {
   return (
     <div className='w-full h-full'>
-      <JBMDXPost>
-        <Content />
-      </JBMDXPost>
+      <JBMDXPost post={post} />
     </div>
   )
 }

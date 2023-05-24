@@ -4,14 +4,13 @@ import { MDXComponents } from 'mdx/types'
 import 'github-markdown-css'
 import { useTheme } from 'next-themes'
 
-interface MDXProps {
-  children: React.ReactNode
-}
+import { PostProps } from '@/pages/blog/[...id]'
 
 const components = {}
 
-export default function JBMDXPost({ children }: MDXProps) {
+export default function JBMDXPost({ post }: PostProps) {
   const { theme } = useTheme()
+
   return (
     <>
       <style jsx>
@@ -26,7 +25,11 @@ export default function JBMDXPost({ children }: MDXProps) {
         `}
       </style>
       <MDXProvider components={components as MDXComponents}>
-        <div className='markdown-body'>{children}</div>
+        <article className='markdown-body'>
+          <h1>{post?.title}</h1>
+          <p>{post?.date}</p>
+          <div>{post?.contents}</div>
+        </article>
       </MDXProvider>
     </>
   )
