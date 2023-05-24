@@ -13,7 +13,6 @@ export default function Blog({ posts }: PostProps) {
 
 export async function getStaticProps() {
   const posts = await getPostsData()
-  console.log(posts)
 
   return {
     props: {

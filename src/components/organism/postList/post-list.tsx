@@ -4,7 +4,6 @@ import React from 'react'
 
 export default function PostList({ posts }: PostProps) {
   const postElements = posts?.map((post) => {
-    console.log(post)
     return (
       <div className='mb-5' key={post.title}>
         <JBPost data={post} />

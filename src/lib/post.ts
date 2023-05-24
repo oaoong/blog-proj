@@ -1,33 +1,37 @@
 import fs from 'fs'
 import path from 'path'
-import matter from 'gray-matter'
+import { serialize } from 'next-mdx-remote/serialize'
+import grayMatter from 'gray-matter'
 
-import { PostData } from './posts'
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+
+export type PostMDXData = {
+  body: MDXRemoteSerializeResult<Record<string, unknown>>
+  date: string
+  title: string
+  tags: string
+}
 
 function filterSrc(src: string): string {
   return src.replaceAll(' ', '%20')
 }
 
-export function getPostData(src: string): PostData {
+export async function getPostData(src: string): Promise<PostMDXData> {
   const postDirectory = path.join(
     process.cwd(),
     `src/contents/${filterSrc(src)}.mdx`,
   )
-  const fileName = fs.readFileSync(postDirectory, 'utf-8')
+  const fileContents = fs.readFileSync(postDirectory, 'utf-8')
+  const { data, content } = grayMatter(fileContents)
+  const { title, date, tags } = data
 
-  const matterResult = matter(fileName)
-
-  const id = src
-  const contents = matterResult.content
-  const date = matterResult.data?.date || ''
-  const title = matterResult.data?.title || ''
-  const tags = matterResult.data?.tags || []
+  // MDX 파일 직렬화
+  const mdxContents = await serialize(content)
 
   return {
-    id,
-    contents,
-    title,
+    body: mdxContents,
     date,
+    title,
     tags,
   }
 }

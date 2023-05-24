@@ -1,17 +1,17 @@
 import { getPostData } from '@/lib/post'
 import { getPostsData } from '@/lib/posts'
-import { PostData } from '@/lib/posts'
+import { PostMDXData } from '@/lib/post'
 import BlogPost from '@/templates/blog/blog-post'
 import React from 'react'
 
 export type PostProps = {
-  post: PostData
+  postData: PostMDXData
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ postData }: PostProps) {
   return (
     <div className='w-full h-full'>
-      <BlogPost post={post} />
+      <BlogPost postData={postData} />
     </div>
   )
 }
@@ -29,12 +29,11 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: { params: { id: string[] } }) {
-  console.log(params)
-  const post = await getPostData(params.id[0])
+  const postData = await getPostData(params.id[0])
 
   return {
     props: {
-      post,
+      postData,
     },
   }
 }
