@@ -9,6 +9,7 @@ module.exports = {
     './src/modules/**/*.{js,ts,jsx,tsx,mdx}',
     './src/templates/**/*.{js,ts,jsx,tsx,mdx}',
     './src/contents/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   darkMode: 'class',
   theme: {
@@ -24,11 +25,13 @@ module.exports = {
         'background-color': '#e5e5e5',
         'primary-color': '#404040',
         'card-background-color': '#d4d4d4',
+        'secondary-color': '#d4d4d4',
       },
       dark: {
         'background-color': '#404040',
         'primary-color': '#e5e5e5',
         'card-background-color': '#525252',
+        'secondary-color': '#525252',
       },
     }),
   ],
