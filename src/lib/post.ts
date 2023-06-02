@@ -22,7 +22,7 @@ export type PostMDXData = {
 }
 
 function filterSrc(src: string): string {
-  return src.replaceAll(' ', '%20').replaceAll('.mdx', '')
+  return src.replaceAll(' ', '_').replaceAll('.mdx', '')
 }
 
 export async function getPostData(src: string): Promise<PostMDXData> {

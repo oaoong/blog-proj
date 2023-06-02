@@ -1,5 +1,22 @@
+.prose {
+  @apply mt-10 mb-32;
+}
+
 .prose a {
-  @apply transition-all;
+  @apply transition-all text-primary-color dark:text-background-color;
+}
+
+.prose p {
+  @apply transition-all text-primary-color dark:text-background-color;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply transition-all text-primary-color dark:text-background-color;
 }
 
 .prose .anchor {
@@ -11,7 +28,6 @@
 }
 
 .prose .anchor:after {
-  @apply text-gray-300 dark:text-gray-700;
   content: '#';
 }
 
@@ -30,4 +46,15 @@
 
 #contents ~ ul {
   @apply bg-secondary-color m-0 list-decimal rounded-lg;
+}
+
+#contents ~ ul > li {
+  &::marker {
+    @apply text-primary-color;
+  }
+  & > ul > li {
+    &::marker {
+      @apply text-primary-color;
+    }
+  }
 }
