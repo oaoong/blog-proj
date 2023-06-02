@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url(./code.css);
+@import url(./prose.css);
+@import 'intellij-prism.css';
+
 :root {
   --background-rgb: #edf2f7;
   --foreground-rgb: #edf2f7;

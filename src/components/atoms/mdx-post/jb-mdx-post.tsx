@@ -1,7 +1,5 @@
 import React from 'react'
-import { MDXProvider } from '@mdx-js/react'
 import { MDXComponents } from 'mdx/types'
-import 'github-markdown-css'
 import { useTheme } from 'next-themes'
 import { MDXRemote } from 'next-mdx-remote'
 
@@ -30,7 +28,7 @@ export default function JBMDXPost({ postData }: PostProps) {
         <div className='flex flex-col p-6 pt-12'>
           <h1 className='mb-4 text-4xl font-bold'>{postData?.title}</h1>
           <h3 className='mb-4 font-bold text-l'>작성일: {postData?.date}</h3>
-          <article className='markdown-body'>
+          <article className='prose'>
             <MDXRemote
               {...postData?.body}
               components={components as MDXComponents}

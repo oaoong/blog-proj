@@ -1,0 +1,33 @@
+.prose a {
+  @apply transition-all;
+}
+
+.prose .anchor {
+  @apply invisible absolute no-underline;
+
+  margin-left: -1em;
+  padding-right: 0.5em;
+  cursor: pointer;
+}
+
+.prose .anchor:after {
+  @apply text-gray-300 dark:text-gray-700;
+  content: '#';
+}
+
+.anchor:hover,
+.prose *:hover > .anchor {
+  @apply visible;
+}
+
+.prose .rehype-code-title {
+  @apply rounded-t-lg px-2 py-1 text-sm font-bold border-primary-color bg-secondary-color text-primary-color;
+}
+
+.prose .language-tsx {
+  @apply m-0 rounded-t-none;
+}
+
+#contents ~ ul {
+  @apply bg-secondary-color m-0 list-decimal rounded-lg;
+}

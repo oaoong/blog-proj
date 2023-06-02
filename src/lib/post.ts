@@ -2,11 +2,20 @@ import fs from 'fs'
 import path from 'path'
 import { serialize } from 'next-mdx-remote/serialize'
 import grayMatter from 'gray-matter'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypePrism from 'rehype-prism-plus'
+import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
+import rehypeCodeTitles from 'rehype-code-titles'
+import remarkToc from 'remark-toc'
 
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 
 export type PostMDXData = {
-  body: MDXRemoteSerializeResult<Record<string, unknown>>
+  body: MDXRemoteSerializeResult<
+    Record<string, unknown>,
+    Record<string, unknown>
+  >
   date: string
   title: string
   tags: string
@@ -26,10 +35,37 @@ export async function getPostData(src: string): Promise<PostMDXData> {
   const { title, date, tags } = data
 
   // MDX 파일 직렬화
-  const mdxContents = await serialize(content)
+  const serializeMdx = await serialize(content, {
+    parseFrontmatter: true,
+    mdxOptions: {
+      remarkPlugins: [
+        remarkGfm,
+        [remarkToc, { maxDepth: 3, heading: 'Contents' }],
+      ],
+      rehypePlugins: [
+        rehypeSlug,
+        rehypeCodeTitles,
+        [
+          rehypePrism,
+          {
+            showLineNumbers: true,
+          },
+        ],
+        [
+          rehypeAutolinkHeadings,
+          {
+            properties: {
+              className: ['anchor'],
+            },
+          },
+        ],
+      ],
+      format: 'mdx',
+    },
+  })
 
   return {
-    body: mdxContents,
+    body: serializeMdx,
     date,
     title,
     tags,
