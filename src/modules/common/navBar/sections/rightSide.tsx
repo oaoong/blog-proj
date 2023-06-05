@@ -8,9 +8,6 @@ export default function RightSide() {
       <Link href={NAVIGATION_PATH.HOME} className='hover:underline'>
         HOME
       </Link>
-      <Link href={NAVIGATION_PATH.BLOG} className='hover:underline'>
-        BLOG
-      </Link>
     </div>
   )
 }

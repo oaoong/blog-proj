@@ -1,5 +1,5 @@
 import JBPost from '@/components/molecules/post/jb-post'
-import { PostProps } from '@/pages/blog'
+import { PostProps } from '@/pages'
 import React from 'react'
 
 export default function PostList({ posts }: PostProps) {
