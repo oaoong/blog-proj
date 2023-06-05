@@ -1,5 +1,5 @@
 import PostList from '@/components/organism/postList/post-list'
-import { PostProps } from '@/pages/blog'
+import { PostProps } from '@/pages'
 import React from 'react'
 
 export default function BlogPage({ posts }: PostProps) {
