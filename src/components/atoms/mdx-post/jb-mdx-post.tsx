@@ -2,7 +2,7 @@ import React from 'react'
 import { MDXComponents } from 'mdx/types'
 import { MDXRemote } from 'next-mdx-remote'
 
-import { PostProps } from '@/pages/blog/[...id]'
+import { PostProps } from '@/pages/post/[...id]'
 import JBTag from '../tag/jb-tag'
 
 const components = {}
