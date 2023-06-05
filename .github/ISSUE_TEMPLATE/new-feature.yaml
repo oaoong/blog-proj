@@ -1,0 +1,22 @@
+name: New Feature
+description: 새로운 피처 추가 관련 이슈 템플릿
+title: "[Feature] "
+labels: ["feature"]
+body:
+        - type: markdown
+          attributes:
+                value: |
+                        새로운 피처 추가 시, 아래 항목을 작성해주세요.
+        - type: textarea
+          id: what-about
+          attributes:
+                label: 어떤 내용에 대한 개발 사항인가요?
+                description: 예상되는 동작을 포함해 작성해주세요(스크린샷 등).
+                placeholder: 예) 로그인 완료 시, 메인 페이지로 이동합니다.
+          validations:
+                required: true
+        - type: textarea
+          id: how-to
+          attributes:
+                label: 관련 링크나 참고할 내용이 있다면 작성해주세요. (선택)
+                placeholder: 예) https://www.notion.so/...
