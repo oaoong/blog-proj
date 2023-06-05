@@ -3,6 +3,7 @@ import JBCard from '@/components/atoms/card/jb-card'
 import JBTag from '@/components/atoms/tag/jb-tag'
 import Link from 'next/link'
 import { PostData } from '@/lib/posts'
+import NAVIGATION_PATH from '@/config/path'
 
 type PropsData = { data: PostData }
 
@@ -21,7 +22,7 @@ const JBPost = forwardRef<HTMLDivElement, JBPostProps>(
     })
 
     return (
-      <Link href={`blog/${title}`}>
+      <Link href={`${NAVIGATION_PATH.BLOG}/${title}`}>
         <JBCard>
           <div ref={ref} {...props} className='relative block w-full h-full'>
             <div className='flex justify-between mb-2 mobile:flex-col'>
