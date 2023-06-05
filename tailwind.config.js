@@ -1,4 +1,5 @@
 const { createThemes } = require('tw-colors')
+const { spacing } = require('tailwindcss/defaultTheme')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -18,6 +19,18 @@ module.exports = {
       tablet: { max: '768px' },
       laptop: { max: '1280px' },
     },
+    extend: {
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            //...
+            'h1,h2,h3,h4': {
+              'scroll-margin-top': spacing[32],
+            },
+          },
+        },
+      }),
+    },
   },
   plugins: [
     createThemes({
@@ -34,5 +47,23 @@ module.exports = {
         'secondary-color': '#525252',
       },
     }),
+    require('@tailwindcss/typography'),
+    ({ addUtilities }) => {
+      addUtilities(
+        {
+          '.no-scrollbar': {
+            /* IE and Edge */
+            '-ms-overflow-style': 'none',
+            /* Firefox */
+            'scrollbar-width': 'none',
+            /* Safari and Chrome */
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
+          },
+        },
+        ['responsive'],
+      )
+    },
   ],
 }

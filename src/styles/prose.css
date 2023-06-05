@@ -1,0 +1,60 @@
+.prose {
+  @apply mt-10 mb-32;
+}
+
+.prose a {
+  @apply transition-all text-primary-color dark:text-background-color;
+}
+
+.prose p {
+  @apply transition-all text-primary-color dark:text-background-color;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply transition-all text-primary-color dark:text-background-color;
+}
+
+.prose .anchor {
+  @apply invisible absolute no-underline;
+
+  margin-left: -1em;
+  padding-right: 0.5em;
+  cursor: pointer;
+}
+
+.prose .anchor:after {
+  content: '#';
+}
+
+.anchor:hover,
+.prose *:hover > .anchor {
+  @apply visible;
+}
+
+.prose .rehype-code-title {
+  @apply rounded-t-lg px-2 py-1 text-sm font-bold border-primary-color bg-secondary-color text-primary-color;
+}
+
+.prose .language-tsx {
+  @apply m-0 rounded-t-none;
+}
+
+#contents ~ ul {
+  @apply bg-secondary-color m-0 list-decimal rounded-lg;
+}
+
+#contents ~ ul > li {
+  &::marker {
+    @apply text-primary-color;
+  }
+  & > ul > li {
+    &::marker {
+      @apply text-primary-color;
+    }
+  }
+}

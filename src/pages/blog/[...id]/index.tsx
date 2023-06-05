@@ -24,7 +24,7 @@ export async function getStaticPaths() {
         id: [post.id],
       },
     })),
-    fallback: true,
+    fallback: 'blocking',
   }
 }
 
