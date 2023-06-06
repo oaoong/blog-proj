@@ -11,18 +11,18 @@ export default function SideBar({ tags }: { tags: string[] }) {
     )
   })
   return (
-    <div>
-      <div className='flex flex-col items-center pt-8'>
+    <div className='p-2'>
+      <div className='flex flex-col items-center pt-8 mb-4 '>
         <Image
           src={'/images/profile.jpg'}
           width={'100'}
           height={'100'}
           alt='profile'
-          className='rounded-full'
+          className='rounded-full shadow-md'
         />
-        <div className='font-bold'>oaoong</div>
+        <div className='font-bold '>oaoong</div>
       </div>
-      <div className='flex flex-wrap gap-2 p-3 m-2 rounded-md h-fit w-fit mobile:w-full mobile:h-auto bg-secondary-color'>
+      <div className='flex flex-wrap gap-2 p-3 mx-auto rounded-md shadow-md h-fit w-fit mobile:w-[calc(100%-6px)] mobile:h-auto bg-secondary-color'>
         {tagElements}
       </div>
     </div>
