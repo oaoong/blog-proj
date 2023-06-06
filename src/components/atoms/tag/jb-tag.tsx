@@ -1,5 +1,7 @@
+import NAVIGATION_PATH from '@/config/path'
 import { type VariantProps, cva } from 'class-variance-authority'
 import classNames from 'classnames'
+import Link from 'next/link'
 import React, { forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
 
@@ -31,7 +33,9 @@ const JBTag = forwardRef<HTMLDivElement, JBTagProps>(
         {...props}
         className={classNames(twMerge(tagVariants({ intent: props.intent })))}
       >
-        {props.children}
+        <Link href={`${NAVIGATION_PATH.TAG}/${props.children}`}>
+          {props.children}
+        </Link>
       </div>
     )
   },
