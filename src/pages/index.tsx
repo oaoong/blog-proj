@@ -1,23 +1,21 @@
-import { useEffect } from 'react'
 import { PostData, getPostsData } from '@/lib/posts'
 import { getTagsByPosts } from '@/lib/tag'
-import { tagsState } from '@/state/atom'
 import BlogPage from '@/templates/blog/blog-page'
-import { useSetRecoilState } from 'recoil'
+import SideBar from '@/modules/common/sideBar'
 
 export type PostProps = {
   posts: PostData[]
-  tags?: string[]
 }
 
-export default function Blog({ posts, tags = [] }: PostProps) {
-  const setTags = useSetRecoilState<string[]>(tagsState)
-
-  useEffect(() => {
-    setTags(tags)
-  }, [setTags, tags])
-
-  return <BlogPage posts={posts} />
+export default function Blog({ posts, tags }: PostProps & { tags: string[] }) {
+  return (
+    <div className='flex flex-row w-full pt-24 mobile:flex-col'>
+      <SideBar tags={tags} />
+      <div className='flex flex-col items-center justify-center flex-grow w-screen text-primary-color bg-background-color'>
+        <BlogPage posts={posts} />
+      </div>
+    </div>
+  )
 }
 
 export async function getStaticProps() {

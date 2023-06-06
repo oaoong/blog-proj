@@ -10,7 +10,7 @@ export type PostProps = {
 
 export default function Post({ postData }: PostProps) {
   return (
-    <div className='w-full h-full'>
+    <div className='flex flex-row justify-center pt-24'>
       <BlogPost postData={postData} />
     </div>
   )
