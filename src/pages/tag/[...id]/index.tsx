@@ -16,7 +16,7 @@ export default function FilteredPostList({
   return (
     <div className='flex flex-row pt-24 mobile:flex-col'>
       <SideBar tags={tags} />
-      <div className='flex flex-col items-center justify-center flex-grow w-screen text-primary-color bg-background-color'>
+      <div className='flex flex-col items-center justify-center flex-grow w-screen text-primary-color bg-background-color mobile:w-[calc(100%-6px)]'>
         <h1 className='w-full p-5 text-4xl font-bold'>{tag}</h1>
         <BlogPage posts={filteredPosts} />
       </div>

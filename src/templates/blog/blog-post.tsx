@@ -4,7 +4,7 @@ import { PostProps } from '@/pages/post/[...id]'
 
 export default function BlogPost({ postData }: PostProps) {
   return (
-    <div className='w-2/3 h-full'>
+    <div className='w-5/6 h-full'>
       <JBMDXPost postData={postData} />
     </div>
   )
