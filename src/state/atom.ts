@@ -1,8 +1,8 @@
-import { atom } from 'recoil'
+import { RecoilState, atom } from 'recoil'
 
 const tagsState = atom({
   key: 'tagsState',
-  default: [''],
+  default: [] as string[],
 })
 
 export { tagsState }
