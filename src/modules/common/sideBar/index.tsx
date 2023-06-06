@@ -1,9 +1,11 @@
 import JBTag from '@/components/atoms/tag/jb-tag'
 import React from 'react'
 import Image from 'next/image'
+import { useRecoilValue } from 'recoil'
+import { tagsState } from '@/state/atom'
 
 export default function SideBar() {
-  const tags = ['jo', 'hi', '일상', '일기']
+  const tags = useRecoilValue<string[]>(tagsState)
   const tagElements = tags.map((tag) => {
     return (
       <div className='h-fit' key={tag}>
