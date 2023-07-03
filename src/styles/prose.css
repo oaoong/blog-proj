@@ -15,7 +15,8 @@
 .prose h3,
 .prose h4,
 .prose h5,
-.prose h6 {
+.prose h6 .prose ul,
+.prose li {
   @apply transition-all text-primary-color dark:text-background-color;
 }
 
