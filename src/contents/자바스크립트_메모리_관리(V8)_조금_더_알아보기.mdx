@@ -23,9 +23,7 @@ let b = a // 요 부분에서의 동작
 
 > primitive value는 불변하다.
 
-‘hello’는 원시값이고 불변하므로 a와 b는 같은 value memory space의 주소값을 참조하지만, 다른 변수 주소값을 가진다.
-
->
+> ‘hello’는 원시값이고 불변하므로 a와 b는 같은 value memory space의 주소값을 참조하지만, 다른 변수 주소값을 가진다.
 
 (위 개념에서 혼동이 있었음)
 
@@ -52,7 +50,7 @@ V8의 JavaScript 값은 개체, 배열, 숫자 또는 문자열인지 여부에 
 
 ![230712-000922](</posts/자바스크립트_메모리_관리(V8)_조금_더_알아보기/230712-000922.png>)
 
-- 숫자의 경우는 더 복잡하다. 아래 블로그의 내용을 옮겨봤다.
+**숫자의 경우는 더 복잡하다. 아래 블로그의 내용을 옮겨봤다.**
 
 https://v8.dev/blog/pointer-compression#value-tagging-in-v8
 
@@ -65,7 +63,7 @@ smi에 해당하지 않는… (예를들어 3.14) 값은
    1. 객체 프로퍼티가 가리키면 mutable한 `HeapNumber`가 되어 매번 새로운 `HeapNumber`를 할당하지 않고 값을 업데이트 할 수 있다. → `HeapNumber`를 공유할 수 없게 만드는 대가로 대다수 사용 패턴에 대한 유익한 tradeoff라고 생각한다.
    2. 다른 경우에는 재사용할 수 있지만 추가 성능 오버헤드가 발생하지 않는 경우에만 재사용할 수 있다. → 예를들어 3+0.14 와 314/100과 같은 두 개의 계산 결과가 할당될 때 이는 두 개의 `HeapNumber`값으로 할당된다. → 이 둘의 계산 결과를 확인한 이후 3.14가 존재하는지 확인하는 것이 그만한 가치가 없기 때문.
 
-_2-a. 내용의 내용이 제대로 이해가 안 간다… 번역을 잘못한건지_
+_2-1. 내용의 내용이 제대로 이해가 안 간다… 번역을 잘못한건지_
 
 _재사용이 가능하다는 의미처럼 들렸는데, 계속 보다보니 프로퍼티의 변수를 변경 가능한 HeapNumber로 유지해 값이 업데이트 되어도 다른 HeapNumber를 찾거나 하지 않고 그 자체를 갱신한다는 내용같은데, 때문에 같은 값이라도 여러 개의 HeapNumber를 memory space에 할당할 수 있다는걸까? 다른 의견이 있으시면 알려주세요…_
 
@@ -164,8 +162,6 @@ heap number에 해당하는 값은 같은 값을 가져도 @818117과 @818113으
 (위 글의 주요 내용은 아래 글들의 내용을 토대로 번역해 작성하고, 직접 코드를 작성해서 테스트해보았다.)
 
 [What are JavaScript variables made of](https://www.zhenghao.io/posts/javascript-variables)
-
----
 
 [Pointer Compression in V8 · V8](https://v8.dev/blog/pointer-compression#value-tagging-in-v8)
 
