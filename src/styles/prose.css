@@ -1,5 +1,5 @@
 .prose {
-  @apply mt-10 mb-32;
+  @apply mt-10 mb-32 w-full;
 }
 
 .prose a {

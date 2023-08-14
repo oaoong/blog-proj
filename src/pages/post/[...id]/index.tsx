@@ -2,7 +2,7 @@ import { getPostData } from '@/lib/post'
 import { getPostsData } from '@/lib/posts'
 import { PostMDXData } from '@/lib/post'
 import BlogPost from '@/templates/blog/blog-post'
-import React from 'react'
+import Utterances from '@/components/molecules/utterances'
 
 export type PostProps = {
   postData: PostMDXData
@@ -10,8 +10,11 @@ export type PostProps = {
 
 export default function Post({ postData }: PostProps) {
   return (
-    <div className='flex flex-row justify-center pt-24'>
+    <div className='flex flex-col justify-center w-1/2 pt-48 mx-auto'>
       <BlogPost postData={postData} />
+      <div className='w-full pt-12 '>
+        <Utterances />
+      </div>
     </div>
   )
 }
