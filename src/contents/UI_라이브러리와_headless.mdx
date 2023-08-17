@@ -1,0 +1,58 @@
+---
+title: UI 라이브러리와 headless
+date: 2023.07.13
+tags: UI, CSS
+---
+
+## Contents
+
+# UI 라이브러리에 대해서…
+
+UI 라이브러리는 왜 필요할까?
+개발을 하다 보면 자주 듣는 격언, **\***바퀴를 다시 발명하지 마라(Don't reinvent the wheel)**\*** 라는 문장으로 쉽게 이해 할 수 있다.
+
+과거 회사에서 사내의 디자인 시스템 개발에 대한 이야기가 있었다. 여기서 느낀 것은 고유한 디자인 시스템은 일관성과 효율에서 아주 긍정적이나, 어디까지나 회사 규모와 상황을 우선적으로 고려해야 한다는 점.
+
+내 경험의 의식의 흐름을 따라가보자.
+
+1. 새 프로젝트마다 겹치는 컴포넌트가 눈에 띈다.
+   1. 회사나 브랜드에는 공유하는 디자인이 있다.
+   2. 매번 만드는 재사용성 컴포넌트가 발생한다. - ui나 atom 정도에 폴더에 들어가는…
+2. 공동으로 관리하고 재사용 할 디자인 시스템이 있으면 좋겠다.
+
+   1. npm으로 간단히 라이브러리화 할 수도 있고, 특정 집단 내에서만 사용 가능하게 공유할 수도 있다.
+   2. 매번 새로 만드느니, 한 번 수고해서 다 같이 만들어두고 편하게 불러와서 사용하면 좋지 않을까.
+   3. 이와 관련해서는 쉽게 결론지을 수 있다. 2021년 NextJS 컨퍼런스 강연에서 Radix UI 개발자로 참여했던 페드로 두아르테는 모든 브라우저에서 잘 작동하고 모든 스크린 리더를 지원하는 드롭다운 메뉴를 구현하는데 사용된 시간을 아래 자료를 통해 설명했다고 한다.
+
+      ![230817-134852](/posts/UI_라이브러리와_headless/230817-134852.png)
+
+   4. 즉 웬만한 규모가 아닌 이상 어느정도의 완성도를 보장하는 UI component set을 만드는데에는 꽤 무리가 있다.
+
+3. 역시 기존 UI 라이브러리를 잘 활용하면 되겠다.
+   1. antd, MUI 등 유명하고 잘 만들어진 라이브러리가 많다.
+   2. 잘 사용하고 있었다.
+   3. 음… 조금 더 커스텀한 기능을 추가할 수는 없을까
+   4. 어찌저찌 만들기는 했는데, 배보다 배꼽이 더 커진 느낌이다.
+   5. 음… 조금 더 커스텀한 스타일을 적용할 수는 없을까
+   6. 나는 antd와 styled-component를 함께 사용하고 있었는데, dev tool로 태그를 뒤져서 억지로 스타일을 덧붙이거나(이마저도 들쑥날쑥했다) less loader를 통해 node modules의 antd 스타일 파일을 import하여 커스텀하고, 이를 적용시켜주어야 했다.
+   7. 이게 맞나… 일단 import한 코드 길이도 어마어마해서 원하는 결과를 내려면 시간이 꽤 소요됐다.
+4. 더 나은 방법이 없을까. 기능은 취하고 스타일은 커스텀할 수 있는?
+
+하던 와중, 최근 새로 진행하는 프로젝트에서 tailwind를 기반으로 css를 작성하고 있는데 headless 식의 UI를 팀원 분의 제안으로 도입해보게 됐다.
+
+> \***\*Completely unstyled, fully accessible UI components, designed to integrate beautifully with Tailwind CSS.\*\***
+
+\_[headlessui.com](https://headlessui.com/)
+
+완전히 **unstyled**이고, 완전히 **accessible**한… 내가 찾던 그게 꽤 오래 전부터 핫했구나
+
+> **So, developers are forced to build custom components; an incredibly difficult task. As a result, most components on the web are inaccessible, non-performant, and lacking important features.
+> Our goal is to create a well-funded, open-source component library that the community can use to build accessible design systems.**
+
+\_[radix-ui.com](http://radix-ui.com/)
+
+내가 느낀 이런 headless한 성격의 ui 라이브러리의 가장 큰 매력은 몇 가지 스킬(정식으로 제공하거나, 애드온처럼 있는)들을 활용하여 같은 기능의 컴포넌트에 대해 프리셋을 설정해 둔 후, 외부에서 선택사항을 주입하여 재활용성을 극대화 할 수 있다는 것이다.
+
+이에 대한 예시는 다른 글에서 조금 더 자세히 다뤄보겠다.
+
+그나저나… headless한 라이브러리를 선택해서 이에 대한 프리셋을 담아 디자인 시스템화 해서 사용하는 것도 여건이 충분치 않은 상황에 좋은 선택지가 될 것 같은데, 과거에 이런 방식에 대해 말해봤으나 딱히 관심 받지 못한 기억이 떠오른다. 한땀한땀 직접 쌓아올리거나 아예 시도하지 않거나가 아니라 적당히 중장비를 사용해서 만들어 나가는 것도 좋은 것 같다는 생각이다.
