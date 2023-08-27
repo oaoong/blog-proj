@@ -15,13 +15,12 @@ export default function Post({ postData }: PostProps) {
       <Head>
         <title>{postData.title}</title>
         <meta name='title' property='og:title' content={postData.title} />
-        {postData?.thumbnail && (
-          <meta
-            name='image'
-            property='og:image'
-            content={'/public' + postData.thumbnail}
-          />
-        )}
+        <meta
+          name='image'
+          property='og:image'
+          content={'./public' + postData.thumbnail}
+        />
+        <meta property='og:image:type' content='image/png' />
       </Head>
       <div className='flex flex-col justify-center w-1/2 pt-48 mx-auto'>
         <BlogPost postData={postData} />
