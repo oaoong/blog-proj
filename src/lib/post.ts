@@ -19,6 +19,7 @@ export type PostMDXData = {
   date: string
   title: string
   tags: string
+  thumbnail?: string
 }
 
 function filterSrc(src: string): string {
@@ -33,6 +34,10 @@ export async function getPostData(src: string): Promise<PostMDXData> {
   const fileContents = fs.readFileSync(postDirectory, 'utf-8')
   const { data, content } = grayMatter(fileContents)
   const { title, date, tags } = data
+
+  const thumbnailDirectory = content
+    .match(/!\[(.+)(\]\(<)(.+)>\)/g)?.[0]
+    .match(/\/(.+)\.png/g)?.[0]
 
   // MDX 파일 직렬화
   const serializeMdx = await serialize(content, {
@@ -69,5 +74,6 @@ export async function getPostData(src: string): Promise<PostMDXData> {
     date,
     title,
     tags,
+    thumbnail: thumbnailDirectory,
   }
 }
