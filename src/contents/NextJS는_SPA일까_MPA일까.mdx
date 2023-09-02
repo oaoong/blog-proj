@@ -1,0 +1,135 @@
+---
+title: NextJS는 SPA일까 MPA일까
+date: 2023.09.03
+tags: NextJS, rendering
+---
+
+## Contents
+
+# 다양한 렌더링 방식
+
+대표적으로 SSR과 Static Rendering, CSR을 들 수 있다.
+
+## SSR
+
+![230903-025756](/posts/NextJS는_SPA일까_MPA일까/230903-025756.png)
+
+SSR은 서버 사이드에서 브라우저의 요청 시점에 HTML 파일을 생성하고, 브라우저가 응답을 받기 전에 처리되므로 클라이언트에서 템플릿 작성을 위한 중복 요청이 방지된다.
+
+이후 DOM에 맞는 JS 이벤트 등을 hydration 과정을 통해 처리해주면 된다.
+
+## Static Rendering
+
+![230903-025811](/posts/NextJS는_SPA일까_MPA일까/230903-025811.png)
+
+정적 렌더링은 빌드 타임에 이미 해당하는 HTML 파일을 작성한다. SSR은 요청에 따라 매번 HTML을 서버에서 작성하고 응답하는 과정이 필요하지만, 정적 렌더링은 만들어 둔 파일을 전송하면 되기 때문에 TTFB(Time to First Byte) 시간의 단축이 가능하다.
+
+## CSR
+
+![230903-025825](/posts/NextJS는_SPA일까_MPA일까/230903-025825.png)
+
+CSR은 JS를 전달받고 브라우저에서 직접 페이지를 렌더링한다. 즉, JS 파일을 파싱한 후 데이터 전달이나 템플릿 작성 등 모든 과정이 클라이언트를 기반으로 처리된다.
+
+# SPA와 MPA
+
+![230903-025836](/posts/NextJS는_SPA일까_MPA일까/230903-025836.png)
+
+MPA는 페이지마다 HTML 페이지를 서버에서 받고, SPA는 하나의 HTML을 기반으로 서버에서 JSON 등의 데이터를 요청해 동작한다.
+
+# SPA ≠CSR, MPA ≠ SSR
+
+SPA, MPA는 웹 페이지의 구성 방식, CSR, SSR은 렌더링 방식이다.
+
+즉 대응되는 개념이 아닌, 별개의 개념이다.
+
+# 이것은 SPA인가 MPA인가
+
+NextJS에서 SSR을 사용하면 MPA로 동작한다고 생각했는데 그러면 매번 서버에서 제공하는 HTML로 갈아끼워지겠고… 어떻게 상태를 관리하고 유지하는걸까?
+
+결론적으로 NextJS는 SPA라 하기도 MPA라 하기도 명확하지 않다.
+
+추상적인 개념이지만 PESPA(Progressively Enhanced Single Page App)에 대해 알아보자.
+
+![230903-025855](/posts/NextJS는_SPA일까_MPA일까/230903-025855.png)
+
+SPA에서 챙긴 서버와의 중복 동작 문제 해결과 MPA의 요청/응답 기반 단순한 구조의 장점을 결합한… PESPA는 두 장점을 모두 취하기 위해 제안되었다.
+
+기본적인 컨셉은 서버와 클라이언트 모두에서 동일한 구조를 공유한다는 것이다.
+
+페이지의 데이터를 최신 상태로 유지하기 위해 변형이 발생할 때 PESPA는 페이지의 데이터 유효성을 다시 검사하는 브라우저 동작을 에뮬레이트한다.
+
+즉 전체 페이지를 다시 로드하는 MPA와는 달리 요청과 재검증이 함께 발생한다. 서버에서 변경점을 렌더링하고 클라이언트에서 업데이트 할 수 있는 대화형 구조가 가능키 때문에 코드 중복 문제를 해결할 수 있다.
+
+하지만 pending state나, optimistic UI등을 처리하는 것은 서버에 위치할 수 없으므로 클라이언트에서만 실행되는 일부 코드를 갖게된다.
+
+라우팅 동작에 대해 알아보자.
+
+## MPA
+
+![230903-025910](/posts/NextJS는_SPA일까_MPA일까/230903-025910.png)
+
+MPA는 기본적으로 요청에 따른 서버 렌더링 결과를 클라이언트에서 HTML를 새로 렌더링하여 처리한다.
+
+전통적인 MPA에서는 애초에 client-side Navigation에 대해서 다룰 수 없다.
+
+## SPA
+
+![230903-025924](/posts/NextJS는_SPA일까_MPA일까/230903-025924.png)
+
+prevent default하고, JS를 통해 URL을 업데이트한다.
+
+클라이언트 라우팅 로직에서 업데이트 요구사항을 결정하고 데이터 요청을 하는 동안 UI는 대기.
+
+서버에서 라우팅 로직을 통해 요청한 데이터를 가져와 클라이언트에 전달한다.
+
+클라이언트에서 데이터를 받아 해당 데이터를 UI 업데이트에 사용한다.
+
+## PESPA
+
+![230903-025935](/posts/NextJS는_SPA일까_MPA일까/230903-025935.png)
+
+SPA와 같이 prevent default.
+
+라우터는 새로운 요청에 대한 데이터와 UI를 한 번에 결정한다.
+
+데이터를 가져와 UI에 반영한다.
+
+# NextJS
+
+CSR과 SSR, SSG 등의 다양한 전략을 개발자가 적절히 선택하게 해 주는 Remix와 NextJS 등의 도구는 PESPA에서 server와 client 간 동일한 구조를 이어주는 브릿지 역할을 제공해준다고 할 수 있다.
+
+NextJS는 서버에서 페이지를 렌더링하고 클라이언트에서 구성 요소만 hydration함에도 불구하고 페이지가 로드되면 여전히 SPA로 작동한다.
+
+첫 번째 렌더링이 서버에서 이루어지지만 첫 페이지에서의 라우팅 및 탐색이 클라이언트에서 발생한다. 즉 SSR과 CSR의 장점을 섞은 방식이라 할 수 있겠다.
+
+첫 요청 페이지를 SPA 삼아서 CSR하기 때문에 전역 상태와 같은 기능을 사용할 수 있다.
+
+NextJS에서는 Link 태그를 통해 prefetch를 하여 페이지를 미리 로드해둔다.
+
+구체적으로 말하자면 이동할 가능성이 있는 페이지는 미리 가져오는 작업을 하고, 그런 경우 HTML을 새로 받아와 갈아끼우는게 아닌 미리 로드된 데이터를 바로 랜더링하여 보여주는 것이다.
+
+덕분에 SPA처럼 빠른 라우팅 전환이 가능하면서도, SSR에서 제공하는 준비된 DOM을 얻을 수 있는 것이다(React와 같이 JS를 hydration하는 과정이 일어난다).
+
+로드 시 SSR 방식의 페이지는 JS를 로딩하고, SSG 방식의 페이지는 HTML이 아닌 JSON파일을 돌려준다.
+
+![230903-025946](/posts/NextJS는_SPA일까_MPA일까/230903-025946.png)
+
+[Rendering on the Web](https://web.dev/rendering-on-the-web/)
+
+[NextJS - SPA or MPA?](https://www.code-insights.dev/posts/nextjs-spa-or-mpa)
+
+[The Web’s Next Transition](https://www.epicweb.dev/the-webs-next-transition)
+
+[next.js의 SSG 제대로 이해하고 사용하기 | parkgang.log](https://parkgang.github.io/blog/2021/09/07/lets-properly-understand-and-use-the-ssg-of-nextjs/)
+
+[SPA로 SSR 구현하기](https://taero.blog/posts/SPA-with-SSR)
+
+[Next.js의 렌더링 과정(Hydrate) 알아보기](https://www.howdy-mj.me/next/hydrate)
+
+[The Web’s Next Transition(웹 애플리케이션 아키텍처의 미래)](https://itchallenger.tistory.com/750)
+
+[Next.js 13 master course - Static / Dynamic Rendering](https://velog.io/@jay/Next.js-13-master-course-Static-Dynamic-Rendering)
+
+[Next.js is an SPA](https://www.reddit.com/r/nextjs/comments/11qotnt/nextjs_is_an_spa/)
+
+[Web: Next.js Link와 Prefetch 과정 파헤쳐보기](https://medium.com/hcleedev/web-next-js-link와-prefetch-과정-파헤쳐보기-44e22ace13e7)
