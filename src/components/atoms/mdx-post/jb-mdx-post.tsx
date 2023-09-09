@@ -11,7 +11,7 @@ export default function JBMDXPost({ postData }: PostProps) {
   return (
     postData && (
       <>
-        <div className='flex flex-col mobile:px-4 mobile:pt-20 '>
+        <div className='flex flex-col items-center mobile:px-4 mobile:pt-20'>
           <h1 className='mb-4 text-4xl font-bold'>{postData?.title}</h1>
           <h3 className='mb-4 font-bold text-l'>작성일: {postData?.date}</h3>
           <div className='flex w-full h-0 border-t-2' />
