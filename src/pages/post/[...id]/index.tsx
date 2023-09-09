@@ -24,7 +24,7 @@ export default function Post({ postData }: PostProps) {
         <meta property='og:image:alt' content='thumbnail' />
         <meta property='og:url' content={'https://jay-logs.vercel.app'} />
       </Head>
-      <div className='flex flex-col justify-center w-1/2 pt-48 mx-auto'>
+      <div className='flex flex-col justify-center px-5 pt-48 mx-auto w-3ull'>
         <BlogPost postData={postData} />
         <div className='w-full pt-12 '>
           <Utterances />
