@@ -1,0 +1,315 @@
+---
+title: 이펙티브 타입스크립트 더보기(1-2)
+date: 2023.09.29
+tags: TS
+---
+
+## Contents
+
+_이펙티브 타입스크립트 도서의 1, 2 장 중 혼동이 있을만한 내용에 대해 다룹니다._
+
+# 타입스크립트의 목적
+
+1장은 타입스크립트의 목적이나, 개념적인 위치에 대해 설명하고 있다.
+
+이 책은 초반 장이 중요하면서도 모호하게 다가오기 때문에 초반 장을 중요하게 봐야 한다.
+
+타입스크립트 개발의 의도에 공감하는 식으로 접근하면 편했다.
+
+> **“타입스크립트는 자바스크립트의 상위 집합(superset)이다”**
+
+- 자바스크립트가 타입스크립트를 포함하는 것이 아니라 타입스크립트가 자바스크립트를 포함한다.
+  - → 모든 자바스크립트 프로그램은 타입스크립트 프로그램으로써 작용할 수 있지만, 반대는 성립하지 않는다.
+
+> 💡 the intent is to catch legitimate bugs in our programs.
+
+- 타입스크립트의 목적은 코드의 설계가 런타임에서 문제를 일으킬 수 있는 경우를 최대한 방지하는 목적이지, 런타임에서의 타입을 강제하거나 확인하는 데에 있지 않다.
+  - → 개인적으로 이후에 나오는 각종 케이스들을 보면 타입스크립트는 프로그램의 타입 안정성을 보장하기 위한 각종 편의와 예외를 제공한다. strict하게 무조건적인 규칙을 검사하는 것이 아닌, 실제 나타날 수 있는 위험을 줄이는 장치를 담고 있다는 인상을 받았다.
+- 즉 타입 체크를 통과하더라도 여전히 런타임에 오류가 발생할 수 있다. 그리고 런타임 오류 방지를 애초에 보장하지 않는다.
+  - → 간단한 예로, 타입을 ‘apple’로 한정했는데, api로 받은 결과가 이와 다른 경우를 생각해보자. 타입스크립트에서 커버해 줄 수 없는 부분이다.
+
+# 타입스크립트 컴파일러의 역할
+
+> **타입스크립트 컴파일러는 두 가지 역할을 수행합니다.**
+
+- 최신 타입스크립트/자바스크립트를 브라우저에서 동작할 수 있도록 구버전의 자바스크립트로 트랜스파일한다.
+- 코드의 타입 오류를 체크한다.
+
+→ 이 두 가지 역할은 서로 완벽히 독립적이다.
+
+> 💡 tsc 트랜스파일링 하면 babel은 필요 없나요?
+
+- babel은 여러 기능을 제공하지만 주요 기능은 polyfill이다.
+- tsc의 target 설정으로 이를 처리할 수 있다.
+
+- babel의 `@babel/preset-typescript` 를 사용하면 ts를 js로 트랜스파일링하면서 타입 구문을 제거한다. 그러면 타입스크립트 사용의 이점이 줄어든다.
+- babel의 이점은 단순 js 버전 호환에만 있지 않다. browerlist 등을 통해 세분화된 커스터마이징이나 플러그인을 통해 특정 라이브러리에 대한 호환성을 제공해 줄 수 있다.
+- 그래서 이 둘을 사용할 경우 babel을 통해 트랜스파일링 하고, tsc를 함께 사용해 타입 체킹을 해 주는 것이 좋다.
+- vite 등 최신 빌드 툴 등에서는 이런 트랜스파일링과 타입 체크를 적절히 자동으로 체크해준다.
+
+→ 타입스크립트는 ‘런타임’ 오버헤드가 없는 대신, ‘빌드타임’ 오버헤드는 존재한다.
+
+# 구조적 타이핑과 잉여 속성 체크 그리고 타입 추론 이해하기
+
+## 구조적 타이핑
+
+> **자바스크립트는 본질적으로 덕 타이핑(duck typing) 기반입니다.**
+
+- 타입스크립트 또한 이를 그대로 모델링한다.
+- 호환되는 구조에 대해 타입 에러 없이 사용이 된다.
+
+> 💡 타입스크립트의 타입 시스템은 기본적으로 ‘열려(open)’있기 때문입니다.
+
+- `a, b`를 요구하는 함수에 대해서 `a, b, c, d` 가 들어있는 데이터를 넘기든, `a, b, x` 가 들어있는 데이터를 넘기든 문제로 인식할 수 없다.
+
+```tsx
+// 봉인된, 닫혀있는 타입 시스템을 생각하고 만든 코드
+function calculate(v: {x: number, y:number}): number{
+  let sum = 0
+	for(const key of Object.keys(v)){
+		sum += v[key]
+	}
+    return sum
+}
+
+-> error
+// 'string' 타입이 v에 입력될 수 있다는 에러가 나온다.
+// Object.keys()는 결과값으로 string[]을 제공한다. key는 keyof v가 아닌 string으로 추론된다.
+
+// 단순히 에러를 처리해 준 코드
+function calculate(v: { [x: string]: number; y: number }): number {
+  let sum = 0
+  for (const key of Object.keys(v)) {
+    sum += v[key]
+  }
+
+  return sum
+}
+
+-> no error but not good
+// 'string' 인덱스 시그니처를 추가해주어 x, y 외에 속성이 string 키의 number 값일 것임을 이해시킨다.
+// 하지만 설계 의도(x와 y만 사용하는 목적)과는 다른 결과를 불러올 수 있다.
+
+// 열려있는 타입 시스템에 의도를 명확히는 코드
+function calculate(v: {x: number, y:number}): number{
+    let sum = 0
+    sum += v.x + v.y
+
+    return sum
+}
+
+-> good
+// 명확히 사용할 내용을 나타내주어 타입에서나 런타임에서나 문제 소지를 줄일 수 있다.
+```
+
+## 타입이 값들의 집합이라고 생각하기
+
+> **’할당 가능한 값들의 집합’이 타입이라고 생각하면 됩니다.**
+
+- 이 집합은 타입의 ‘범위’라고 부르기도 한다.
+- 유닛(unit) 타입이라고도 불리는 리터럴(literal) 타입은 한 가지 값만 포함하는 타입이다.
+- 유니온 타입은 값 집합들의 합집합을 일컫는다.
+
+> **집합의 관점에서, 타입 체커의 주요 역할은 하나의 집합이 다른 집합의 부분 집합인지 검사하는 것이라고 볼 수 있습니다.**
+
+- 할당 가능한’이라는 문구는 집합의 관점에서, ‘~의 원소(값과 타입의 관계)’ 또는 ‘~의 부분 집합(두 타입의 관계)’를 의미한다.
+- & 연산자는 두 타입의 인터섹션(intersection, 교집합)을 계산한다.
+
+다들 이해하기 힘들어했던 부분이다. 차근차근 아래 내용을 살펴보자.
+
+```tsx
+interface Person {
+  name: string
+}
+
+interface Lifespan {
+  birth: Date
+  death?: Date
+}
+```
+
+위와 같은 두 인터페이스가 있다.
+
+```tsx
+type PersonSpan = Person & Lifespan // -> ?
+```
+
+- 타입 연산자는 인터페이스의 속성이 아닌 값의 집합(타입의 범위)에 적용된다.
+- 추가적인 속성을 가지는 값도 여전히 그 타입에 속하게 된다.
+
+즉 선택적 속성 외 모든 타입이 필요하다.
+
+→ Person 범위와 Lifespan 범위에 모두 속하는 값의 타입이 된다.
+
+```tsx
+type K = keyof (Person | Lifespan) // -> ?
+```
+
+`'name' | 'birth'` 아닌가요? 많이 했던 부분이다. 차근차근 뜯어보자.
+
+잠시 다른 예를 살펴보자. microsoft의 typescript 깃허브의 이슈로 올라온 내용이다(https://github.com/microsoft/TypeScript/issues/12815).
+
+```tsx
+type A = { a: string }
+type B = { b: string }
+type AorB = A | B
+
+declare const AorB: AorB
+
+if (AorB.a) {
+  // use AorB.a
+}
+```
+
+위 AorB.a의 사용에서 타입스크립트는 에러를 나타낸다.
+
+(속성 a가 AorB 유형에 존재하지 않습니다…)
+
+왤까? 왜냐하면 AorB에서는 a가 string임을 보장할 수 없기 때문이다. 타입스크립트는 구조적 타이핑을 사용하기 때문에, B와 유니온 된 속성 a는 어떤 값이든 될 수 있다.
+
+타입스크립트는 임의의 속성인 현재 상태에 a를 정할 수 없다. 그러므로 하나의 해결책으로 아래와 같이 a를 알려준다.
+
+```tsx
+type A = { a: string }
+type B = { b: string; a: undefined }
+type AorB = A | B
+
+declare const AorB: AorB
+
+if (AorB.a) {
+  // Ok, a는 string|undefined
+}
+```
+
+(사실 in 키워드를 사용해 AorB가 type A임을 알려주어도 된다. 다만 이 예시를 통해 설명하고자 하는 내용을 위해 위 예시를 작성했다)
+
+다시 원래 내용을 살펴보자.
+
+```tsx
+Person | Lifespan -> {name: string} | {birth: Date}
+```
+
+→ `{name: string; birth: string} | {birth: Date; name: Date}` 가 되도 문제가 없다.
+
+이 때 `keyof(Person | Lifespan)` 은 왜 `never(공집합)`으로 추론될까?
+
+타입스크립트에서는 이 결과를 사용할 때 type-safe를 보장해야 한다.
+
+즉 `keyof T` 인 `k` 가 `T[k]` 로 사용됐을 때 안전한 작업을 보장한다.
+
+```tsx
+interface Person {
+  name: string
+}
+
+interface Lifespan {
+  birth: Date
+  death?: Date
+}
+
+type PersonSpan = Person | Lifespan
+
+const person1: PersonSpan = {
+  // ...
+}
+
+person1['name'] // -> ?
+```
+
+위 예시에 대해서 `person1['name']` 에 대해서 타입스크립트는 뭐라고 추론해야할까?
+
+이전까지의 설명 내용을 통해 위 추측이 implicit한 any로 밖에 될 수 없다는 것을 알 수 있다. 그러므로 `keyof PersonSpan` 으로 생각할 수 있는 ‘name’은 특정한 타입의 값을 보장해 줄 수 없다(무엇이든 될 수 있기 때문에).
+
+다시 돌아와서, 아래와 같이 Person과 Lifespan의 union의 key는 공집합으로 추론될 수 밖에 없음을 이해할 수 있다.
+
+```tsx
+keyof(Person | Lifespan) // -> never
+```
+
+## 잉여 속성 체크
+
+구조적 타이핑과 잉여 속성 체크를 연속으로 접하고는 많은 혼동이 있었다. 이에 대해 알아보자.
+
+> **구조적 타입 시스템에서 발생할 수 있는 중요한 종류의 오류를 잡을 수 있도록 ‘잉여 속성 체크’라는 과정이 수행됩니다.**
+
+- 타입이 명시된 변수에 객체 리터럴을 할당할 때 타입스크립트는 해당 타입의 속성이 있는지, 그리고 ‘그 외의 속성은 없는지’ 확인한다.
+
+```tsx
+interface A {
+	one: number;
+	two: number;
+}
+const a: A = {
+	one: 1,
+	two: 2
+	three: '3' // 개체 리터럴은 알려진 속성만 지정할 수 있으며 'A' 형식'three'가 없습니다.
+}
+```
+
+- 구조적 타이핑 관점에서 보면 오류가 없어야한다.
+
+> **잉여 속성 체크가 할당 가능 검사와는 별도의 과정이라는 것을 알아야 합니다.**
+
+- 타입스크립트는 단순히 런타임에 예외를 던지는 코드에 오류를 표시하는 것 뿐만 아니라, 의도와 다르게 작성된 코드까지 찾으려고 한다.
+
+```tsx
+interface Options {
+	title: string;
+	darkMode?: boolean
+}
+
+function createWindow(options: Options) {
+	...
+}
+
+createWindow({
+	title: 'hi',
+	darkmode: true // 개체 리터럴은 알려진 속성만 지정할 수 있지만 'Options' 형식에 'darkmode'이(가) 없습니다.
+// 'darkMode'을(를) 쓰려고 했습니까?
+})
+
+```
+
+- 순수한 구조적 타입 체커는 이런 종류의 오류를 찾아내지 못한다.
+- 잉여 속성 체크를 이용하면 기본적으로 타입 시스템의 구조적 본질을 해치지 않으면서도 객체 리터럴에 알 수 없는 속성을 허용하지 않음으로써, 앞에서 다룬 문제점을 방지할 수 있다.
+
+- 임시 변수를 사용하거나 객체 리터럴이 아닌 경우에는 잉여 속성 체크가 적용되지 않고 오류는 사라진다.
+
+```tsx
+const intermediate = { darkmode: true, title: 'hi' }
+
+const o: Options = intermediate // -> 정상
+```
+
+- 타입 단언문을 사용할 때에도 적용되지 않는다.
+- 인덱스 시그니처를 사용해서 타입스크립트가 추가적인 속성을 예상하도록 할 수 있다.
+
+```tsx
+interface Options {
+  darkMode?: boolean
+  [otherOptions: string]: unknown
+}
+const o: Options = { darkmode: true } // 정상
+```
+
+- 선택적 속성만 가지는 ‘약한(weak)’ 타입에도 비슷한 체크가 동작한다.
+
+```tsx
+interface A {
+  name?: string
+  phoneNumber?: string
+}
+
+const person = { phonenumber: '01012341234' }
+const p: A = person
+// ~ '{ phonenumber }' 유형에 'A' 유형과 공통적인 속성이 없습니다.
+
+// 이런 약한 타입에 대해서 타입스크립튼는 값 타입과 선언 타입에 공통된 속성이 있는지 확인하는
+// 별도의 체크를 수행한다.
+```
+
+→ 공통 속성 체크는 잉여 속성 체크와 다르게 약한 타입과 관련된 할당문마다 수행된다.
+
+→ 임시 변수를 제거하더라도 공통 속성 체크는 여전히 동작한다.
+
+즉 타입스크립트는 구조적 타이핑으로 모든 것을 일괄 적용하는 것이 아닌, 경우에 따라 잉여 속성 체크나 공통 속성 체크를 통해 사용자가 의도에 맞게 코드를 작성한 것이 맞는지 확인하는 별도의 장치를 두었다.
