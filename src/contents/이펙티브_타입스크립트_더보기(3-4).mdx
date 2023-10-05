@@ -1,0 +1,304 @@
+---
+title: 이펙티브 타입스크립트 더보기(3-4)
+date: 2023.10.02
+tags: TS
+---
+
+## Contents
+
+# readonly와 as const
+
+> 💡 아래 예시에서 v2의 as const 처리된 x와 v3에서 readonly 처리된 x는 어떤 차이가 있을까?
+
+```tsx
+const v1 = {
+  x: 1,
+  y: 2,
+}
+
+const v2 = {
+  x: 1 as const,
+  y: 2,
+}
+
+const v3 = {
+  x: 1,
+  y: 2,
+} as const
+```
+
+- v2.x의 값은 `1` 자체로 고정된다.
+  ```tsx
+  v2.x = 1 // ok
+  v2.x = 3 // Type '3' is not assignable to type '1'.
+  ```
+  ```tsx
+  // v2는 아래와 같이 인식된다.
+  const v2: {
+    x: 1
+    y: number
+  }
+  ```
+- v3는 말 그대로 `readonly` 처리된다.
+  ```tsx
+  v3.x = 1 // Cannot assign to 'x' because it is a read-only property.
+  v3.y = 1 // Cannot assign to 'y' because it is a read-only property.
+  ```
+
+미묘한 차이가 있다.
+
+# 선택적 속성에 대한 업데이트 사항
+
+책의 설명과 다른 부분이 있다.
+
+```tsx
+// 4. 한꺼번에 여러 속성 추가
+declare let hasDates: boolean
+const nameTitle = { name: 'lee', title: 'hi' }
+const pharaoh = {
+  ...nameTitle,
+  ...(hasDates ? { start: -2589, end: -2566 } : {}),
+}
+pharaoh.start
+// 오류 -> '{name: string; title: string;}' 형식에 'start' 속성이 없습니다.
+
+// pharaoh.start를 사용하고 싶다면 헬퍼 함수 사용
+function addOptional<T extends object, U extends object>(
+  a: T,
+  b: U | null,
+): T & Partial<U> {
+  return { ...a, ...b }
+}
+
+const pharaoh = addOptional(
+  nameTitle,
+  hasDates ? { start: -2589, end: -2566 } : null,
+)
+pharaoh.start // 정상, 타입이 number | undefined;
+```
+
+위 예시에서 선택적 속성에 대해 union으로 처리되기 때문에 별도의(`addOptional`) 처리가 필요하다고 책에서는 설명한다.
+
+하지만 최근 버전의 타입스크립트에서는 그냥 `number | undefined` 로 추론이 된다. 왜일까?
+
+- 4.0.5
+  ![231005-162452](</posts/이펙티브_타입스크립트_더보기(3-4)/231005-162452.png>)
+
+책에서의 설명대로 객체의 유니온으로 추론된다.
+
+- 4.1.5
+  ![231005-162504](</posts/이펙티브_타입스크립트_더보기(3-4)/231005-162504.png>)
+
+책에서의 설명과는 달리 바로 optional로 처리된다.
+
+### 공식 문서의 release note의 설명을 살펴보자.
+
+[Documentation - TypeScript 4.1](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-1.html#conditional-spreads-create-optional-properties)
+
+기존 방식은 실제 케이스에 대해서 더 정확하게 모델링하고 있다.
+
+하지만 극단적으로 spread가 중첩되는 경우, 각 중첩에 대해 모든 경우의 수를 계산하는데 드는 비용은 극단적이며 대부분의 경우 그럴만한 가치가 없다.
+
+때문에 typescript 팀은 더 나은 성능과 일반적인 케이스의 더 나은 사용을 위해 optional로 처리하도록 동작을 수정했다고 한다.
+
+# 타입 좁히기
+
+> 💡 filter method로 값을 좁힐 수 없을까?
+
+책에서 언급한 예시에 대해서 살펴보자.
+
+```tsx
+const members = ['Janet', 'Michael']
+  .map((who) => jackson5.find((n) => n === who))
+  .filter((who) => who !== undefined) // 타입이 (string | undefined)[]
+```
+
+위 예시에서 타입시스템의 추론을 예상해보자면 `string[]` 라든가, `['Jenet', 'Michael']` 이라든가의 식으로 생각할 수 있지만 결과는 그렇지 않다.
+
+후자는 그렇다 치지만 왜 전자도 걸러내지 못하는 걸까?
+
+- 간단히 보는 결론
+
+![231005-162527](</posts/이펙티브_타입스크립트_더보기(3-4)/231005-162527.png>)
+
+`lib.es5.d.ts` 의 filter 구현이다. filter 메서드는 value 값을 제너릭으로 그 배열을 반환한다.
+
+`find()` 에서는 `string | undefined` 를 반환하고 이 결과로 만들어진 mapping된 함수가 filter에서 처리되므로 생각과는 다르게 `string | undefined[]` 의 결과를 얻게 된다.
+
+### 왜일까?
+
+애초에 filter 메서드에 반환 타입에 대해 구체화하는 절차를 추가하면 되지 않을까?
+
+하지만 filter의 목적을 더 생각해 볼 필요가 있다. 타입스크립트는 자바스크립트의 구현을 바탕으로 타입 추론을 한다.
+
+→ filter 메서드는 boolean 값을 반환하여 필터링을 수행할 뿐, 내부 구현을 확인하여 타입을 확정짓는 과정과는 차이가 있다.
+
+typescript repository에서도 관련 이슈를 꽤 찾아볼 수 있다.
+
+https://github.com/microsoft/TypeScript/issues/16069
+
+- 해결책
+
+```tsx
+function isDefined<T>(x: T | undefined): x is T {
+  return x !== undefined
+}
+const members = ['Janet', 'Michael']
+  .map((who) => jackson5.find((n) => n === who))
+  .filter(isDefined)
+```
+
+사용자 정의 타입 가드를 추가해 줄 수 있다.
+
+# 중첩 객체의 타입 좁히기 문제
+
+중첩 객체에서의 태그된 유니온은 타입 좁히기가 동작하지 않는다.
+
+스터디에서 팀원 분이 작성해 주신 아래 예시를 통해 살펴보자.
+
+```tsx
+type LoadingState = { status: { label: 'loading' } }
+type SuccessState = { status: { label: 'success' }; data: string }
+type ErrorState = { status: { label: 'error' }; message: string }
+
+declare let fetchState: LoadingState | SuccessState | ErrorState
+
+switch (fetchState.status.label) {
+  case 'loading':
+    console.log('로딩중..')
+    break
+  case 'success':
+    console.log('성공! 데이터: ', fetchState.data) //  --- (1)
+    break
+  case 'error':
+    console.error('에러: ', fetchState.message) //  --- (2)
+    break
+}
+```
+
+예상대로라면 각 (1), (2)의 추론이 `SuccessState` , `ErrorState` 로 추론될 것 같다.
+
+하지만 `LoadingState | SuccessState | ErrorState` 로 모두 의도와는 다르게 타입 좁히기가 되지 않는다. data와 message를 보장하지 못하고 에러를 표시한다.
+
+### 왜일까?
+
+현재 타입스크립트 시스템은 정적인 분석을 시행하고 있고, 위 예시에서 사용하려 하는 ‘nested discriminated unions’의 개념을 이해하지 못한다.
+
+현 시스템은 직접적인 관계의 프로퍼티에 대해서만 tag로써 유효하다.
+
+관련한 제안이 있지만 크게 진행되고 있지 않은 듯 하다.
+
+https://github.com/microsoft/TypeScript/issues/18758
+
+- 해결책 중 한 가지는 사용자 정의 타입 가드를 활용하는 것이다.
+
+```tsx
+function isLoadingState(state: {
+  status: { label: string }
+}): state is LoadingState {
+  return state.status.label === 'loading'
+}
+```
+
+# 더 구체적인 타입 사용하기
+
+아래 예시를 보자.
+
+```tsx
+// 기본 구현
+function pluck(records, key) {
+  return records.map((r) => r[key])
+}
+
+// 타입 정의
+function pluck(records: any[], key: string): any[] {
+  return records.map((r) => r[key])
+}
+```
+
+- any 타입으로 처리해 정밀하지 못하다. 특히 반환값에서의 any는 주의할 필요가 있다.
+
+```tsx
+function pluck<T>(records: T[], key: keyof T) {
+  return records.map((r) => r[key])
+}
+```
+
+- `T[keyof T][]` 의 반환값을 추론한다.
+- 문제가 있다.
+  - `keyof T` 는 모든 T[]의 key 값이기 때문에 records의 아이템의 모든 타입들의 유니온으로 추론된다.
+
+```tsx
+function pluck<T, K extends keyof T>(records: T[], key: K): T[K][] {
+  return records.map((r) => r[key])
+}
+```
+
+- 위와 같이 K를 T의 특정 key로 제한한다.
+- 해당하는 key의 value의 타입으로 추론이 제한된다.
+
+# 상표 기법 활용하기
+
+런타임에서 체크하기 쉽지만, 타입에서는 체크하기 어려운 부분에 대해 상표를 임시로 붙여줄 수 있다.
+
+```tsx
+interface Vector2D {
+  x: number
+  y: number
+}
+function calculateNorm(p: Vector2D) {
+  return Math.sqrt(p.x * p.x + p.y * p.y)
+}
+
+const vec3D = { x: 3, y: 4, z: 5 }
+calculateNorm(vec3D) // 결과가 나오나, 의도치 않음
+
+interface Vector2D {
+  _brand: '2d'
+  x: number
+  y: number
+}
+function vec2D(x: number, y: number): Vector2D {
+  return { x, y, _brand: '2d' }
+}
+function calculateNorm(p: Vector2D) {
+  return Math.sqrt(p.x * p.x + p.y * p.y)
+}
+
+const vec3D = { x: 3, y: 4, z: 5 }
+calculateNorm(vec3D) // '_brand' 속성이 ... 형식에 없습니다.
+```
+
+- number 타입에도 상표를 붙일 수 있다.
+
+```tsx
+type Meters = number & { _brand: 'meters' }
+type Seconds = number & { _brand: 'seconds' }
+
+const meters = (m: number) => m as Meters
+const seconds = (s: number) => s as Seconds
+
+const oneKm = meters(1000) // 타입이 Meters
+const onMin = seconds(60) // 타입이 Seconds
+```
+
+- number 타입에 상표를 붙여도 산술 연산 이후에는 상표가 없어지기 때문에 주의하자.
+- 코드에 여러 단위가 혼합된 많은 수의 숫자가 들어 있는 경우, 숫자의 단위를 문서화하는 괜찮은 방법일 수 있다.
+
+> 💡 string 타입에서도 메서드를 사용하면 상표가 없어지나?
+
+그렇다. 아래 예시를 통해 간단히 확인할 수 있다.
+
+```tsx
+type a = string & { _brand: 'a' }
+
+const cc = (s: string) => s as a
+
+const neww = cc('hi') // -> a
+
+const b = neww.slice(1) // -> string
+```
+
+# 도움 주신 분들
+
+[타입스크립트스터디](https://github.com/prgrms-web-devcourse/FEDC4-TypeScript-Kkobugi-Study) 팀원 분들!!
