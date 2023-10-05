@@ -11,8 +11,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>{`Jay Log Blog`}</title>
-        <meta name='description' content='Jay Log Blog' />
+        <meta name='description' content='Jay Log 블로그입니다.' />
         <link rel='icon' href='/favicon.ico' />
+        <meta property='og:image' content={'/public/images/thumbnail.png'} />
       </Head>
       <ThemeProvider attribute='data-theme'>
         <div className='block w-full h-full min-h-screen bg-background-color'>
