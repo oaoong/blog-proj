@@ -13,7 +13,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>{`Jay Log Blog`}</title>
         <meta name='description' content='Jay Log 블로그입니다.' />
         <link rel='icon' href='/favicon.ico' />
-        <meta property='og:image' content={'/public/images/thumbnail.png'} />
+        <meta
+          property='og:image'
+          content={'https://jay-logs.vercel.app/api/og-image'}
+        />
       </Head>
       <ThemeProvider attribute='data-theme'>
         <div className='block w-full h-full min-h-screen bg-background-color'>
