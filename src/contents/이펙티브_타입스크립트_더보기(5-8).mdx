@@ -1,0 +1,130 @@
+---
+title: 이펙티브 타입스크립트 더보기(3-4)
+date: 2023.10.08
+tags: TS
+---
+
+## Contents
+
+# as 키워드 사용이 불가능한 경우
+
+- `in` 연산자와 사용할 경우
+
+  ```tsx
+  // 에러: 'in' 연산자 오른쪽에 타입 단언 사용 불가능
+  if (('property' in obj) as SomeType) {
+  }
+
+  // 올바른 방법
+  if ('property' in (obj as SomeType)) {
+  }
+  ```
+
+- 타입 가드에서의 리턴 값
+
+  ```tsx
+  // 에러: 타입 가드의 리턴 값에 'as' 사용 불가능
+  function isString(value: any): value is string {
+    return typeof value === ('string' as boolean)
+  }
+
+  // 올바른 방법
+  function isString(value: any): value is string {
+    return typeof value === 'string'
+  }
+  ```
+
+- readonly에 대한 할당
+
+  ```tsx
+  type MyObject = {
+    readonly myProp: number
+  }
+
+  const obj: MyObject = {
+    myProp: 5,
+  }
+
+  obj.myProp = 10 as any // error
+  ```
+
+- 튜플 타입에 대한 길이 제한
+
+  - 튜플은 배열 길이가 고정이므로, `as` 를 사용하여 튜플 길이를 초과하는 할당을 하려는 경우 에러가 발생, 의도인 경우 `as unknown` 체인을 사용한다.
+
+  ```tsx
+  let tuple: [number, number] = [1, 2]
+
+  tuple1 = [1, 2, 3] as [number, number]
+  /*
+  Conversion of type '[number, number, number]' to type '[number, number]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+    Source has 3 element(s) but target allows only 2.(2352)
+  */
+  ```
+
+# 콜백에서 this에 대한 타입 제공하기
+
+- this는 let이나 const와 달리 ‘호출된’ 방식에 따라 달라지는 다이나믹 스코프이다.
+- this 바인딩을 사용하거나, this를 콜백에서 사용할 시에 매개변수에 this를 추가하고, 콜백 함수를 call로 호출한다.
+
+```tsx
+function addKeyListener(
+  el: HTMLElement,
+  fn: (this: HTMLElement, e: KeyboardEvent) => void,
+) {
+  el.addEventListener('keydown', (e) => {
+    fn.call(el, e)
+  })
+}
+
+// 콜백 함수 매개변수에 this를 추가하면 this 바인딩이 체크되어 실수를 방지할 수 있다.
+```
+
+- 또한 라이브러리 사용자의 콜백 함수에서 this를 참조할 수 있고, 안정성이 증가한다.
+- 화살표 함수를 콜백으로 작성하고 this를 참조하려고 하면 타입스크립트에서 문제를 잡아낸다.
+
+# 타입스크립트에서 객체 순회
+
+```tsx
+const obj = {
+  one: 'uno',
+  two: 'dos',
+  three: 'tres',
+}
+for (const k in obj) {
+  const v = obj[k] // obj에 인덱스 시그니처가 없기 때문에 엘리먼트는 암시적으로 'any' 타입
+}
+
+// k의 타입은 string으로 추론되는 반면, obj 객체에는 특정 키만 존재하기 때문에 오류 발생
+
+let k: keyof typeof obj
+for (k in obj) {
+  const v = obj[k]
+}
+
+// k의 타입을 더욱 구체적으로 명시해주어 오류 해결
+```
+
+- 왜일까?
+  - 특정 객체 타입에는 그 외에 할당 가능한 다른 속성이 존재할 수 있다.
+  - 그러므로 타입스크립트는 객체의 키를 string 타입으로 선택하는게 합당하다.
+  - 하지만 keyof 키워드로 한정지으면 string | number로 추론되어 적합하지 못하다.
+  - `Object.entries` 를 사용하자
+
+```tsx
+function foo(abc: ABC) {
+  for (const [k, v] of Object.entries(abc)) {
+    k // string
+    v // any
+  }
+}
+```
+
+- keyof 선언은 상수이거나 추가적인 키 없이 정확한 타입을 원할 경우
+- Object.entries는 더욱 일반적으로 쓰이지만, 키와 값의 타입을 다루기 까다롭다.
+
+# 추천 글
+
+[타입스크립트의 Never 타입 완벽 가이드](https://ui.toast.com/posts/ko_20220323)
+
+[올해 버려야 할 타입스크립트 나쁜 버릇 10가지](https://ui.toast.com/weekly-pick/ko_20210217)
