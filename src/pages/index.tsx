@@ -9,7 +9,7 @@ export type PostProps = {
 
 export default function Blog({ posts, tags }: PostProps & { tags: string[] }) {
   return (
-    <div className='flex flex-row w-full pt-24 mobile:flex-col'>
+    <div className='flex flex-row w-full pt-24 mobile:flex-col max-w-[1920px] mx-auto'>
       <SideBar tags={tags} />
       <div className='flex flex-col items-center justify-center flex-grow w-screen text-primary-color bg-background-color mobile:w-[calc(100%-6px)]'>
         <BlogPage posts={posts} />

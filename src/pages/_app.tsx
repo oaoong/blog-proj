@@ -19,7 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <ThemeProvider attribute='data-theme'>
-        <div className='block w-full h-full min-h-screen bg-background-color'>
+        <div className='block w-full h-full min-h-screen bg-background-color min-w-[250px]'>
           <NavBar />
           <Component {...pageProps} />
           <Footer />

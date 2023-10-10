@@ -12,7 +12,7 @@ module.exports = {
     './src/contents/**/*.{js,ts,jsx,tsx,mdx}',
     './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class',
+  darkMode: ['class'],
   theme: {
     screens: {
       mobile: { max: '640px' },
@@ -27,6 +27,14 @@ module.exports = {
             'h1,h2,h3,h4': {
               'scroll-margin-top': spacing[32],
             },
+            '--tw-prose-bullets': '#404040',
+            '--tw-prose-invert-bullets': '#e5e5e5',
+            '--tw-prose-quotes': '#404040',
+            '--tw-prose-invert-quotes': '#e5e5e5',
+            '--tw-prose-quote-borders': theme('colors.yellow.500'),
+            '--tw-prose-invert-quote-borders': theme('colors.yellow.500'),
+            '--tw-prose-captions': '#404040',
+            '--tw-prose-invert-captions': '#e5e5e5',
           },
         },
       }),
