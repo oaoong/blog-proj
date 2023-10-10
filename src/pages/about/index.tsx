@@ -17,7 +17,7 @@ export default function AboutPage({ postData }: PostProps) {
 
 export async function getStaticProps() {
   const postData = await getPostData({
-    fileName: 'about',
+    fileName: 'About',
     src: 'src/pages/about',
   })
 
