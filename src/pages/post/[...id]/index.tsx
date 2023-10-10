@@ -24,7 +24,7 @@ export default function Post({ postData }: PostProps) {
         <meta property='og:image:alt' content='thumbnail' />
         <meta property='og:url' content={'https://jay-logs.vercel.app'} />
       </Head>
-      <div className='flex flex-col justify-center px-5 pt-48 mx-auto w-3ull'>
+      <div className='flex flex-col justify-center w-full px-5 pt-48 mx-auto'>
         <BlogPost postData={postData} />
         <div className='w-full pt-12 '>
           <Utterances />
@@ -51,7 +51,7 @@ export async function getStaticProps({ params }: { params: { id: string[] } }) {
     fileName: params.id[0],
     src: 'src/contents',
   })
-  console.log(params.id[0])
+
   return {
     props: {
       postData,
