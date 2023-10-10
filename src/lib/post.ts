@@ -26,10 +26,16 @@ function filterSrc(src: string): string {
   return src.replaceAll(' ', '_').replaceAll('.mdx', '')
 }
 
-export async function getPostData(src: string): Promise<PostMDXData> {
+export async function getPostData({
+  fileName,
+  src,
+}: {
+  fileName: string
+  src: string
+}): Promise<PostMDXData> {
   const postDirectory = path.join(
     process.cwd(),
-    `src/contents/${filterSrc(src)}.mdx`,
+    `${src}/${filterSrc(fileName)}.mdx`,
   )
   const fileContents = fs.readFileSync(postDirectory, 'utf-8')
   const { data, content } = grayMatter(fileContents)
