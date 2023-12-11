@@ -14,25 +14,24 @@ export default function JBMDXPost({ postData }: PostProps) {
 
   return (
     postData && (
-      <>
-        <div className='flex flex-col items-center mobile:px-4 mobile:pt-20'>
-          <h1 className='mb-4 text-4xl font-bold'>{postData?.title}</h1>
-          <h3 className='mb-4 font-bold text-l'>작성일: {postData?.date}</h3>
-          <div className='flex w-full h-0 m-2 mt-10 border-t-2 border-primary-color' />
-          <article className={`prose ${markDownTheme}`}>
-            <MDXRemote
-              {...postData?.body}
-              components={components as MDXComponents}
-            />
-          </article>
-          <div className='flex flex-row gap-1 pt-4 border-t-2 border-primary-color'>
-            <span className='font-bold'>태그: </span>
-            {postData?.tags.split(', ').map((tag) => (
-              <JBTag key={tag}>{tag}</JBTag>
-            ))}
-          </div>
+      <div className='flex flex-col items-center mobile:px-4 mobile:pt-20'>
+        <h1 className='mb-4 text-4xl font-bold'>{postData?.title}</h1>
+        <h3 className='mb-4 font-bold text-l'>작성일: {postData?.date}</h3>
+        <div className='flex w-full h-0 m-2 mt-10 border-t-2 border-primary-color' />
+        <article className={`prose ${markDownTheme}`}>
+          <MDXRemote
+            {...postData?.body}
+            components={components as MDXComponents}
+          />
+        </article>
+        <div className='flex mb-20'>요약: {postData.summary}</div>
+        <div className='flex flex-row gap-1 pt-4 border-t-2 border-primary-color'>
+          <span className='font-bold'>태그: </span>
+          {postData?.tags.split(', ').map((tag) => (
+            <JBTag key={tag}>{tag}</JBTag>
+          ))}
         </div>
-      </>
+      </div>
     )
   )
 }
