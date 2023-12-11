@@ -19,8 +19,8 @@ export default function Blog({ posts, tags }: PostProps & { tags: string[] }) {
 }
 
 export async function getStaticProps() {
-  const posts = await getPostsData()
-  const tags = await getTagsByPosts(posts)
+  const posts = getPostsData()
+  const tags = getTagsByPosts(posts)
 
   return {
     props: {

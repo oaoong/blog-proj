@@ -4,6 +4,7 @@ import JBTag from '@/components/atoms/tag/jb-tag'
 import Link from 'next/link'
 import { PostData } from '@/lib/posts'
 import NAVIGATION_PATH from '@/config/path'
+import { extractAndCombineFirstSentences } from '@/lib/sentense-parser'
 
 type PropsData = { data: PostData }
 
@@ -24,15 +25,18 @@ const JBPost = forwardRef<HTMLDivElement, JBPostProps>(
     return (
       <Link href={`${NAVIGATION_PATH.BLOG}/${title}`}>
         <JBCard>
-          <div ref={ref} {...props} className='relative block w-full h-full'>
-            <div className='flex justify-between mb-2 mobile:flex-col'>
-              <h2 className='text-3xl font-bold cursor-pointer hover:underline'>
+          <div
+            ref={ref}
+            {...props}
+            className='grid w-full h-full overflow-hidden gird-cols-5 '
+          >
+            <div className='flex justify-between row-span-4 mb-2 mobile:flex-col'>
+              <h2 className='text-3xl font-bold cursor-pointer hover:underline line-clamp-2'>
                 {title}
               </h2>
               <p>{date}</p>
             </div>
-            <p>{contents.slice(0, 20)}</p>
-            <div className='absolute bottom-0 flex flex-row gap-2'>
+            <div className='flex flex-row items-end row-span-1 gap-2'>
               {tagElements}
             </div>
           </div>

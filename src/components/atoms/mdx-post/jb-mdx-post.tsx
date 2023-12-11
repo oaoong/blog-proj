@@ -23,9 +23,13 @@ export default function JBMDXPost({ postData }: PostProps) {
             {...postData?.body}
             components={components as MDXComponents}
           />
+          <div className='flex flex-col gap-2'>
+            <h2 className='text-3xl font-bold'>AI 요약</h2>
+            <p>{postData.summary}</p>
+          </div>
         </article>
-        <div className='flex mb-20'>요약: {postData.summary}</div>
-        <div className='flex flex-row gap-1 pt-4 border-t-2 border-primary-color'>
+
+        <div className='flex flex-row w-full gap-1 pt-4 border-t-2 border-primary-color'>
           <span className='font-bold'>태그: </span>
           {postData?.tags.split(', ').map((tag) => (
             <JBTag key={tag}>{tag}</JBTag>
