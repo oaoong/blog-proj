@@ -8,8 +8,10 @@ import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import rehypeCodeTitles from 'rehype-code-titles'
 import remarkToc from 'remark-toc'
+import { extractAndCombineFirstSentences } from './sentense-parser'
 
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { getSummary } from '@/services'
 
 export type PostMDXData = {
   body: MDXRemoteSerializeResult<
@@ -20,6 +22,7 @@ export type PostMDXData = {
   title: string
   tags: string
   thumbnail: string | null
+  summary: string
 }
 
 function filterSrc(src: string): string {
@@ -40,6 +43,10 @@ export async function getPostData({
   const fileContents = fs.readFileSync(postDirectory, 'utf-8')
   const { data, content } = grayMatter(fileContents)
   const { title, date, tags } = data
+
+  const summary = await getSummary({
+    text: extractAndCombineFirstSentences(content),
+  })
 
   const thumbnailDirectory =
     content.match(/!\[(.+)(\]\(<)(.+)>\)/g)?.[0].match(/\/(.+)\.png/g)?.[0] ??
@@ -81,5 +88,6 @@ export async function getPostData({
     title,
     tags,
     thumbnail: thumbnailDirectory,
+    summary: summary.data,
   }
 }

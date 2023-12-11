@@ -1,6 +1,5 @@
-import { getPostData } from '@/lib/post'
+import { getPostData, PostMDXData } from '@/lib/post'
 import { getPostsData } from '@/lib/posts'
-import { PostMDXData } from '@/lib/post'
 import BlogPost from '@/templates/blog/blog-post'
 import Utterances from '@/components/molecules/utterances'
 import Head from 'next/head'
@@ -9,7 +8,7 @@ export type PostProps = {
   postData: PostMDXData
 }
 
-export default function Post({ postData }: PostProps) {
+export default function Post({ postData }: Readonly<PostProps>) {
   return (
     <>
       <Head>
@@ -35,7 +34,7 @@ export default function Post({ postData }: PostProps) {
 }
 
 export async function getStaticPaths() {
-  const posts = await getPostsData()
+  const posts = getPostsData()
   return {
     paths: posts.map((post) => ({
       params: {
