@@ -19,14 +19,14 @@ export default function JBMDXPost({ postData }: PostProps) {
         <h3 className='mb-4 font-bold text-l'>작성일: {postData?.date}</h3>
         <div className='flex w-full h-0 m-2 mt-10 border-t-2 border-primary-color' />
         <article className={`prose ${markDownTheme}`}>
-          <MDXRemote
-            {...postData?.body}
-            components={components as MDXComponents}
-          />
           <div className='flex flex-col gap-2'>
             <h2 className='text-3xl font-bold'>AI 요약</h2>
             <p>{postData.summary}</p>
           </div>
+          <MDXRemote
+            {...postData?.body}
+            components={components as MDXComponents}
+          />
         </article>
 
         <div className='flex flex-row w-full gap-1 pt-4 border-t-2 border-primary-color'>
