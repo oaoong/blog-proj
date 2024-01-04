@@ -1,0 +1,193 @@
+---
+title: validation 로직 리팩토링하기
+date: 2024.01.03
+tags: React
+---
+
+## Contents
+
+# 서론
+
+나비장터 프로젝트를 진행하면서 전체 인증 인가를 관리하는 최상단 `authProvider` 레이어 및 context에 사용될 `useValidate` 훅을 만들었다.
+
+뒤늦은 refresh 기능의 추가와 서버사이드 렌더링 시에 발생하는 문제로 인하여 코드가 복잡해지고 플로우가 쉽게 읽히지 않았지만 시간 상의 이유로 그대로 1.0 릴리즈를 했다.
+
+때문에 이번에 리팩토링을 진행하여 간단히 기록해보고자 한다.
+
+# 변경 전
+
+![240104-142044](/posts/validation_로직_리팩토링하기-불필요한_state_삭제와_useEffect_간소화/240104-142044.png)
+
+## 로직
+
+1. validation에 문제가 발생할 경우
+   1. refresh가 가능하면 `handleTokenRefresh` 로 refresh query에서 얻은 accessToken으로 갱신 후, 로그인 및 유저 정보 state를 갱신한다.
+   2. refresh가 불가능하면 로그인 경로로 이동시킨 후 토스트 에러 메세지를 출력한다.
+2. accessToken이 존재하지 않지만 refreshToken이 존재할 경우
+
+   이는 validationQuery를 로그인 한 상태인, accessToken이 존재할 때에만 enable 되도록 처리했기 때문에 필요하다.
+
+   또한 SSR로 첫 로딩할 시에 acceeToken이 없으면 refreshToken이 있음에도 에러 페이지로 이동되기 때문에 추가된 조건이다.
+
+   - reissue Query에서 얻은 accessToken 값을 통해 유저 정보 및 로그인 상태 갱신
+
+3. 유저 정보가 존재할 경우
+   1. 에러는 없지만 `isLogggedIn` 및 `currentUser` state를 올바르게 초기화하기 위해 필요하다.
+
+## 문제점
+
+- useEffect 내에 과도한 로직 및 의존성
+  - 코드가 쉽게 추적되지 않고, 의존성이 과다하여 로직의 변경이나 추가가 있을 경우 문제의 소지가 다분하다.
+- 불필요한 state 존재와 그로 인한 문제점
+  - `isLoggedIn` 과 `currentUser` 는 query에서 얻는 정보와 cookie 값의 여부에 따라 초기화되는데, 이는 불필요할 뿐더러 각각의 상태의 경우만 늘어난다.
+  - 이로 인해 유저 프로필 등이 따닥 거리면서 뒤늦게 따라오는 경우가 발생한다.
+  - 또한 이로 인해 *3. 유저 정보가 존재할 경우*와 같이 불필요한 조건이 추가되었다.
+
+# 변경 후
+
+## 불필요한 state 삭제하기
+
+```tsx
+const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!accessToken)
+const [currentUser, setCurrentUser] = useState<User | null>(() => null)
+```
+
+`isLoggedIn` 은 token 값에, `currentUser`는 useQuery로 얻는 값에 의존하고 있다.
+
+cookie의 value가 변하는 부분(재발급)은 SSR 이슈로 인해 새로고침으로 이어지게 처리해놓아 새로 마운트되므로 state가 필요하지 않다.
+
+query의 data에 의존하는 state는 추가적인 상태의 경우를 야기한다.
+
+```bash
+1.
+query data: undefined
+currentUser: null
+
+2.
+query data: User
+currentUser: null
+
+3.
+query data: User
+currentUser: User
+```
+
+이를 간소화하기 위해 state를 삭제하고, 이 값들 자체를 return 한다.
+
+```tsx
+return {
+  isLoggedIn: !!accessToken,
+  currentUser: validateUserQuery?.data?.data.userInfo,
+}
+```
+
+## useEffect 로직 분리 및 간소화
+
+```tsx
+// 유저 정보가 존재할 경우
+if (validateUserQuery.data?.data?.userInfo) {
+  const userInfo = validateUserQuery.data.data.userInfo
+  setCurrentUser(() => userInfo)
+  setIsLoggedIn(() => !!userInfo)
+}
+```
+
+```tsx
+const updateLoginState = (userInfo: User) => {
+  setCurrentUser(() => userInfo)
+  setIsLoggedIn(() => !!userInfo)
+  window.location.reload()
+}
+```
+
+기존 로직에서 *3. 유저 정보가 존재할 경우*는 이전 과정을 통해 삭제할 수 있게 된다.
+
+`updateLoginState` 또한 state가 사라졌기 때문에 지워준다.
+
+이제 *1. validation에 문제가 발생한 경우, 2. accessToken이 없지만 refreshToken이 존재할 경우*의 두 가지 케이스를 처리해보자.
+
+```tsx
+useEffect(() => {
+  if ((!accessToken && refreshToken) || validateUserQuery.isError) {
+    refreshTokenIfNeeded()
+  }
+}, [
+  accessToken,
+  refreshToken,
+  reissueTokenQuery?.data?.data.accessToken,
+  validateUserQuery.isError,
+  refreshTokenIfNeeded,
+])
+```
+
+- 1과 2의 조건으로 useEffect 내부 로직을 구성한다. 조건에 해당할 경우 refreshToken을 이용하는 함수를 실행한다.
+
+```tsx
+/**
+ * @description: 토큰 재발급이 필요한 경우, 재발급 후 새로고침합니다.
+ * @description: 리프레시 토큰까지 만료되었을 경우 handleSessionExpiration 실행
+ */
+const refreshTokenIfNeeded = useCallback(async () => {
+  if (!refreshToken || reissueTokenQuery.isError) {
+    handleSessionExpiration()
+  } else if (reissueTokenQuery.data?.data?.accessToken) {
+    const newToken = reissueTokenQuery.data.data.accessToken
+    handleTokenRefresh({ token: newToken })
+  }
+}, [
+  refreshToken,
+  reissueTokenQuery.isError,
+  reissueTokenQuery.data?.data.accessToken,
+  handleSessionExpiration,
+])
+```
+
+- refresh 할 수 없는 경우 `handleSessionExpiration`을 실행한다.
+- refresh 할 수 있는 경우 `handleTokenRefresh`를 실행한다.
+
+```tsx
+/**
+ * @description: 세션 만료시 로그인 페이지로 이동합니다.
+ * @description: 리프레시 토큰까지 만료되었을 경우
+ */
+const handleSessionExpiration = useCallback(() => {
+  Cookies.remove(Environment.tokenName())
+  Cookies.remove(Environment.refreshTokenName())
+  router.push(AppPath.login(), { scroll: false })
+  showAuthErrorToast()
+}, [router, showAuthErrorToast])
+```
+
+```tsx
+/**
+ *
+ * @description 재발급 된 토큰을 쿠키에 저장합니다.
+ */
+const handleTokenRefresh = ({
+  token,
+  expiresInHours = 1,
+}: {
+  token?: string
+  expiresInHours?: number
+}) => {
+  if (!token) return
+  let expiry = new Date()
+  expiry.setHours(expiry.getHours() + expiresInHours)
+  Cookies.set(Environment.tokenName(), token, { expires: expiry })
+  window.location.reload()
+}
+```
+
+- 각각은 위와 같이 구성되었다.
+
+## 최종
+
+![240104-142101](/posts/validation_로직_리팩토링하기-불필요한_state_삭제와_useEffect_간소화/240104-142101.png)
+
+코드의 흐름이 명확해지고, 불필요한 state 제거로 유저 정보가 한 번에 처리되어 데이터 갱신이 화면에 나타나는 안 좋은 경험을 개선했다.
+
+# 추가
+
+`window.location.reload()` 로 처리하는 부분이 사용자 경험에 부정적이기 때문에 필요한 부분만 리랜더링 할 수 있도록 해야한다.
+
+이전에 회고에서 작성한 부분인데 백엔드에 요청할 수 있을지 확인해봐야겠다.
