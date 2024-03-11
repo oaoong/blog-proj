@@ -38,6 +38,10 @@ jobs:
             - name: Run tests
               run: yarn test
 
+            # sitemap을 생성합니다.
+            - name: Generate sitemap
+              run: sh script/generate-sitemap.sh
+
             - name: if_fail
               uses: actions/github-script@v4
               with:

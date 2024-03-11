@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://jay-logs.vercel.app/sitemap/sitemap-common.xml.gz</loc>
+    <lastmod>2024-03-11T06:05:01.502Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://jay-logs.vercel.app/sitemap/sitemap-posts.xml.gz</loc>
+    <lastmod>2024-03-11T06:05:01.502Z</lastmod>
+  </sitemap>
+</sitemapindex>

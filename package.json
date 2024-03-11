@@ -45,7 +45,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
-    "globby": "^14.0.1",
+    "globby": "^11.0.4",
     "husky": "^8.0.3",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
@@ -58,7 +58,8 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "remark-toc": "^8.0.1",
-    "start-server-and-test": "^2.0.0"
+    "start-server-and-test": "^2.0.0",
+    "zlib": "^1.0.5"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
