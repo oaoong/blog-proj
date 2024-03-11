@@ -12,6 +12,10 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>{`Jay Log Blog`}</title>
         <meta name='description' content='Jay Log 블로그입니다.' />
+        <meta
+          name='google-site-verification'
+          content='jGhRZEIMrIBGAliqOU3agQ-qXLNC-0OW-zBF8N9TkrU'
+        />
         <link rel='icon' href='/favicon.ico' />
         <meta
           property='og:image'
